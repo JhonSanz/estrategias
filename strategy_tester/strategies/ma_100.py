@@ -1,27 +1,31 @@
-# def open_position(row):
-#     if (str(row.name) == '0'):
-#         return None
-#     previous = df.loc[int(row.name) - 1]    
-#     condition = (
-#         (row.close < row.MA_100 and previous.type == 'buy') 
-#         or
-#         (row.close > row.MA_100 and previous.type == 'sell')
-#     )
-#     return row.close if condition else None
+def position_type(close, ma_100):
+    return 'sell' if close < ma_100 else 'buy'
 
-# def close_position(row):
-#     if (str(row.name) == '0'):
-#         return None
-#     previous = df.loc[int(row.name) - 1]    
-#     condition = (
-#         (row.close < row.MA_100 and previous.type == 'buy') 
-#         or
-#         (row.close > row.MA_100 and previous.type == 'sell')
-#     )
-#     return row.close if condition else None
+def open_close_position(data, index, close, ma_100):
+    if (str(index) == '0'):
+        return False
+    previous = data.loc[int(index) - 1]
+    return (
+        (close < ma_100 and position_type(
+            previous.close, previous.MA_100) == 'buy') 
+        or
+        (close > ma_100 and position_type(
+            previous.close, previous.MA_100) == 'sell')
+    )
 
-# def position_type(row):
-#     return 'sell' if row['close'] < row['MA_100'] else 'buy'
+def generate_positions_table(data, index, close, ma_100):
+    return {
+        "date_open": data.loc[int(index)].date,
+        "price_open": close,
+        "date_close": None,
+        "price_close": None,
+        "type": position_type(close, ma_100),
+    }
 
-def positions_table(x):
-    return {"jeje": "hola"}
+def positions_table(data):
+    return [
+        generate_positions_table(data, index, close, ma_100)
+        for index, close, ma_100 in
+        zip(data['index'], data['close'], data['MA_100'])
+        if open_close_position(data, index, close, ma_100)
+    ]

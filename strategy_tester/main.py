@@ -32,6 +32,8 @@ df = pd.read_csv(
     names=['date', 'open', 'high', 'low', 'close', 'volume', 'unknown']
 )
 df = df[['date', 'open', 'high', 'low', 'close']]
+df.reset_index(drop=True, inplace=True)
+df.reset_index(inplace=True)
 PARAMETERS = [
     {
         "field_alias": "MA_100",
