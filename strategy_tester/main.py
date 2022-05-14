@@ -1,6 +1,7 @@
 from plot_chart import plot_lines_chart
 from algorithms import AlgorithmSelector
 from strategy import StrategySelector
+from results_table import ResultsTable
 import pandas as pd
 
 
@@ -23,8 +24,8 @@ class StrategyTester:
     def test(self):
         self._choose_algorithms()
         results = StrategySelector(self.data, self.strategy).run()
-        
-        plot_lines_chart()
+        results = ResultsTable(results).generate_totals()
+        plot_lines_chart(results, 'date_close', 'total_sum')
 
 
 df = pd.read_csv(
@@ -34,6 +35,7 @@ df = pd.read_csv(
 df = df[['date', 'open', 'high', 'low', 'close']]
 df.reset_index(drop=True, inplace=True)
 df.reset_index(inplace=True)
+df['date'] = pd.to_datetime(df['date'], format='%Y.%m.%d')
 PARAMETERS = [
     {
         "field_alias": "MA_100",
