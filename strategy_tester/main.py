@@ -1,12 +1,14 @@
 from plot_chart import plot_lines_chart
 from algorithms import AlgorithmSelector
+from strategy import StrategySelector
 import pandas as pd
 
 
 class StrategyTester:
 
-    def __init__(self, data, parameters):
+    def __init__(self, data, strategy, parameters):
         self.data = data
+        self.strategy = strategy
         self.parameters = parameters
 
     def _choose_algorithms(self):
@@ -21,6 +23,7 @@ class StrategyTester:
 
     def test(self):
         self._choose_algorithms()
+        StrategySelector(self.data, self.strategy).run()
         plot_lines_chart()
 
 
@@ -39,5 +42,5 @@ PARAMETERS = [
         }
     }
 ] 
-tester = StrategyTester(df, PARAMETERS)
+tester = StrategyTester(df, "ma_100", PARAMETERS)
 tester.test()
