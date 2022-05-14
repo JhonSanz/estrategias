@@ -1,41 +1,15 @@
-from plot_chart import plot_lines_chart
-from algorithms import AlgorithmSelector
-from strategy import StrategySelector
-from results_table import ResultsTable
 import pandas as pd
+from solver import StrategyTester
 
-
-class StrategyTester:
-    def __init__(self, data, strategy, parameters):
-        self.data = data
-        self.strategy = strategy
-        self.parameters = parameters
-
-    def _choose_algorithms(self):
-        for parameter in self.parameters:
-            self.data[parameter["field_alias"]] = (
-                AlgorithmSelector(
-                    self.data,
-                    parameter["function"],
-                    parameter["params"]
-                ).select_algorithm()
-            )
-
-    def test(self):
-        self._choose_algorithms()
-        results = StrategySelector(self.data, self.strategy).run()
-        results = ResultsTable(results).generate_totals()
-        plot_lines_chart(results, 'date_close', 'total_sum')
-
-
-df = pd.read_csv(
+meta_trader_data = pd.read_csv(
     'datos2.csv',
     names=['date', 'open', 'high', 'low', 'close', 'volume', 'unknown']
 )
-df = df[['date', 'open', 'high', 'low', 'close']]
-df.reset_index(drop=True, inplace=True)
-df.reset_index(inplace=True)
-df['date'] = pd.to_datetime(df['date'], format='%Y.%m.%d')
+meta_trader_data = meta_trader_data[['date', 'open', 'high', 'low', 'close']]
+meta_trader_data.reset_index(drop=True, inplace=True)
+meta_trader_data.reset_index(inplace=True)
+meta_trader_data['date'] = pd.to_datetime(meta_trader_data['date'], format='%Y.%m.%d')
+
 PARAMETERS = [
     {
         "field_alias": "MA_100",
@@ -46,5 +20,10 @@ PARAMETERS = [
         }
     }
 ] 
-tester = StrategyTester(df, "ma_100", PARAMETERS)
+tester = StrategyTester(
+    data=meta_trader_data,
+    strategy="ma_100",
+    parameters=PARAMETERS,
+    months=12
+)
 tester.test()

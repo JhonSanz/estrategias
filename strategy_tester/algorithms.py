@@ -1,3 +1,4 @@
+import importlib
 
 class AlgorithmSelector:
     def __init__(self, data, algorithm, params):
@@ -5,6 +6,7 @@ class AlgorithmSelector:
         self.algorithm = algorithm
         self.params = params
         self.function = None
+        self.module = None
 
     def validate_algorithm_params(self):
         if (
@@ -15,18 +17,15 @@ class AlgorithmSelector:
 
     def validate_algorithm_name(self):
         try:
-            self.function = getattr(AlgorithmSelector, self.algorithm)
+            self.module = importlib.import_module(f"algorithms_repo.{self.algorithm}")
+        except ModuleNotFoundError:
+            raise Exception(f"File algorithms_repo.{self.algorithm} not found")
+        try:
+            self.function = getattr(self.module, self.algorithm)
         except AttributeError:
             raise Exception(f"Function {self.algorithm} not found")
 
     def select_algorithm(self):
         self.validate_algorithm_name()
         self.validate_algorithm_params()
-        return self.function(self, **self.params)
-
-    def moving_average(self, field, periods):
-        '''
-            Returns a Series object with moving average
-        '''
-        return self.data[f'{field}'].rolling(periods).mean()
-
+        return self.function(self.data, **self.params)
