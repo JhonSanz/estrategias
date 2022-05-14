@@ -5,7 +5,6 @@ import pandas as pd
 
 
 class StrategyTester:
-
     def __init__(self, data, strategy, parameters):
         self.data = data
         self.strategy = strategy
@@ -23,7 +22,8 @@ class StrategyTester:
 
     def test(self):
         self._choose_algorithms()
-        StrategySelector(self.data, self.strategy).run()
+        results = StrategySelector(self.data, self.strategy).run()
+        
         plot_lines_chart()
 
 

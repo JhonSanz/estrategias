@@ -1,5 +1,4 @@
 import importlib
-import pandas as pd
 
 class StrategySelector:
     def __init__(self, data, strategy):
@@ -15,6 +14,5 @@ class StrategySelector:
 
     def run(self):
         self.validate_strategy_file()
-        new_dataframe = getattr(self.module, 'positions_table')(self.data)
-        results = pd.DataFrame(data=new_dataframe)
-        print(results)
+        new_dataframe = getattr(self.module, 'StrategyMA100')().positions_table(self.data)
+        return new_dataframe
