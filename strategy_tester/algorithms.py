@@ -1,4 +1,5 @@
 import importlib
+import pandas_ta as ta
 
 class AlgorithmSelector:
     def __init__(self, data, algorithm, params):
@@ -26,6 +27,7 @@ class AlgorithmSelector:
             raise Exception(f"Function {self.algorithm} not found")
 
     def select_algorithm(self):
-        self.validate_algorithm_name()
-        self.validate_algorithm_params()
-        return self.function(self.data, **self.params)
+        # self.validate_algorithm_name()
+        # self.validate_algorithm_params()
+        getattr(self.data.ta, self.algorithm)(**self.params, append=True)
+        return self.data

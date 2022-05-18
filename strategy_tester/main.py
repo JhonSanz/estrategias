@@ -12,14 +12,12 @@ meta_trader_data['date'] = pd.to_datetime(meta_trader_data['date'], format='%Y.%
 
 PARAMETERS = [
     {
-        "field_alias": "MA_100",
-        "function": "moving_average",
+        "function": "sma",
         "params": {
-            "field": "close",
-            "periods": 100
+            "length": 100
         }
     }
-] 
+]
 tester = StrategyTester(
     data=meta_trader_data,
     strategy="ma_100",

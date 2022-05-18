@@ -13,11 +13,7 @@ class StrategyTester:
 
     def _choose_algorithms(self):
         for parameter in self.parameters:
-            if parameter["field_alias"] in self.data.columns:
-                raise Exception(
-                    f'The field {parameter["field_alias"]} already exists in the dataframe'
-                )
-            self.data[parameter["field_alias"]] = (
+            self.data = (
                 AlgorithmSelector(
                     self.data,
                     parameter["function"],

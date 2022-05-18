@@ -10,10 +10,10 @@ class StrategyMA100:
         previous = data.loc[int(index) - 1]
         return (
             (close < ma_100 and self.position_type(
-                previous.close, previous.MA_100) == 'buy') 
+                previous.close, previous.SMA_100) == 'buy') 
             or
             (close > ma_100 and self.position_type(
-                previous.close, previous.MA_100) == 'sell')
+                previous.close, previous.SMA_100) == 'sell')
         )
 
     def open_positions(self, data, index, close, ma_100):
@@ -31,7 +31,7 @@ class StrategyMA100:
         data = [
             self.open_positions(data, index, close, ma_100)
             for index, close, ma_100 in
-            zip(data['index'], data['close'], data['MA_100'])
+            zip(data['index'], data['close'], data['SMA_100'])
             if self.open_close_position(data, index, close, ma_100)
         ]
         results = pd.DataFrame(data=data)
