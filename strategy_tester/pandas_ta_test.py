@@ -3,7 +3,7 @@ import pandas as pd
 import pandas_ta as ta
 
 df = pd.read_csv(
-    'datos2.csv',
+    'syp_1m2 copy.csv',
     names=['date', 'open', 'high', 'low', 'close', 'volume', 'unknown']
 )
 df = df[['date', 'open', 'high', 'low', 'close']]
@@ -16,9 +16,17 @@ df.set_index(pd.DatetimeIndex(df["date"]), inplace=True)
 
 # print(df.tail())
 # print(df.ta.indicators())
-# help(ta.rsi)
+# help(ta.psar)
 
 # print(ta.sma(df['close'], length=100))
-getattr(df.ta, 'rsi')(length=14, append=True)
 # df.ta.sma(length=100, append=True)
-print(df.iloc[0:20])
+
+
+getattr(df.ta, 'psar')(append=True)
+'''
+Index(['date', 'open', 'high', 'low', 'close', 'PSARl_0.02_0.2',
+       'PSARs_0.02_0.2', 'PSARaf_0.02_0.2', 'PSARr_0.02_0.2'],
+      dtype='object')
+'''
+print(df[['close', 'PSARl_0.02_0.2', 'PSARs_0.02_0.2', 'PSARaf_0.02_0.2', 'PSARr_0.02_0.2']].tail(10))
+

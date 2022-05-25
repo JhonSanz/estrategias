@@ -14,5 +14,5 @@ class StrategySelector:
 
     def run(self):
         self.validate_strategy_file()
-        new_dataframe = getattr(self.module, 'StrategyMA100')().positions_table(self.data)
+        new_dataframe = getattr(self.module, 'Strategy')().positions_table(self.data)
         return new_dataframe

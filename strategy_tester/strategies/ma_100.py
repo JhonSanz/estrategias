@@ -1,6 +1,6 @@
 import pandas as pd
 
-class StrategyMA100:
+class Strategy:
     def position_type(self, close, ma_100):
         return 'sell' if close < ma_100 else 'buy'
 

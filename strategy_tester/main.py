@@ -2,7 +2,7 @@ import pandas as pd
 from solver import StrategyTester
 
 meta_trader_data = pd.read_csv(
-    'datos2.csv',
+    'syp_1m2 copy.csv',
     names=['date', 'open', 'high', 'low', 'close', 'volume', 'unknown']
 )
 meta_trader_data = meta_trader_data[['date', 'open', 'high', 'low', 'close']]
@@ -12,15 +12,25 @@ meta_trader_data['date'] = pd.to_datetime(meta_trader_data['date'], format='%Y.%
 
 PARAMETERS = [
     {
-        "function": "sma",
+        "function": "stdev",
         "params": {
-            "length": 100
+            "length": 20
         }
-    }
+    },
+    {
+        "function": "psar",
+        "params": {}
+    },
 ]
+
+STRATEGY_PARAMS = {
+    "file": "parabolic_sar_standard_deviation",
+    "test_mode": True
+}
+
 tester = StrategyTester(
     data=meta_trader_data,
-    strategy="ma_100",
+    strategy_params=STRATEGY_PARAMS,
     parameters=PARAMETERS,
     months=12
 )
