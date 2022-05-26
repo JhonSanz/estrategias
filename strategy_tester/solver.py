@@ -2,7 +2,7 @@ from plot_chart import plot_lines_chart
 from algorithms import AlgorithmSelector
 from strategy import StrategySelector
 from results_table import ResultsTable
-
+from constant import *
 
 class StrategyTester:
     def __init__(self, data, strategy_params, parameters, months):
@@ -22,11 +22,19 @@ class StrategyTester:
             )
 
     def test(self):
+        if (self.strategy_params.get("test_mode") == INITAL_DATA):
+            print(self.data)
+            return
         self._choose_algorithms()
+        if (self.strategy_params.get("test_mode") == AFTER_ALGORITHM):
+            print(self.data)
+            return
         results = StrategySelector(self.data, self.strategy_params.get('file')).run()
-
-        if (self.strategy_params.get("test_mode")):
-            # print(self.data)
+        if (self.strategy_params.get("test_mode") == AFTER_STRATEGY):
+            print(results)
             return
         results = ResultsTable(results).generate_totals()
+        if (self.strategy_params.get("test_mode") == RESULTS_TABLE):
+            print(results)
+            return
         plot_lines_chart(results, 'date_close', 'total_sum', self.months)

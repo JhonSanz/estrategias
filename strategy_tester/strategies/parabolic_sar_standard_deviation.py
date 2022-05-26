@@ -1,65 +1,45 @@
+import numpy as np
 import pandas as pd
 
 class Strategy:
     def __init__(self):
         self.result = []
 
-    def position_type(self, close, ma_100):
-        return 'sell' if close < ma_100 else 'buy'
-
-    def open_positions(self, data, index, date, close, long, short, drop):
-        if(drop == 1):
-            close_data = data[data['date'] == date]
-            row = next((item for item in self.result if item["date_open"] == date), None)
-            if row:
-                row["date_close"] = close_data.chance_date
-                row["price_close"] = close_data.close
-            return
-        new_item = {
-            "date_open": date,
-            "price_open": close,
-            "date_close": "",
-            "price_close": "",
-            "type": "",
-        }
-        if (pd.isna(long)):
-            # compra
-            new_item["type"] = "buy"
-        elif (pd.isna(short)):
-            # venta
-            new_item["type"] = "sell"
-        self.result.append(new_item)
-
-    def define_chance(self, x, data):
-        if (str(x.name) == '0'):
-            return False
-        if (not x.chance):
-            return False
-        previous = data.loc[int(x.name) - 1]
-        return previous.STDEV_20 < 2
-
     def positions_table(self, data):
-        data['chance'] = False
-        data.loc[data['STDEV_20'] > 2, 'chance'] = True
-        data['chance'] = data.apply(lambda x: self.define_chance(x, data), axis=1)
-        changed_indicator = data.loc[data["PSARr_0.02_0.2"] == 1]
-        changed_indicator = [
-            (current, next) for current, next in zip(
-                changed_indicator.index, changed_indicator.index[1:]
-            )
-        ]
-        for item in changed_indicator:
-            for i in range(item[0], item[1]):
-                data.loc[i, ['chance_date']] = data.loc[item[0], ['date']].date
+        data = data[[
+            "index", "date", "close", "STDEV_15", "PSARl_0.02_0.2",
+            "PSARs_0.02_0.2", "PSARr_0.02_0.2"
+        ]].copy()
+        data["chance"] = False
+        data.loc[:, "chance"] = data["STDEV_15"]
+        data.loc[data["chance"] < 2, "chance"] = 0
+        data["chance"] = data["chance"].diff()
+        data["chance"] = np.where(
+            data["chance"] == data["STDEV_15"],
+            True, False
+        )
 
-        for index, date, close, long, short, drop, chance in zip(
-            data['index'], data['date'], data['close'], data['PSARl_0.02_0.2'],
-            data['PSARs_0.02_0.2'], data['PSARr_0.02_0.2'],
-            data['chance']
+        position = {}
+        for date, close, long, short, drop, chance in zip(
+            data["date"], data["close"], data["PSARl_0.02_0.2"],
+            data["PSARs_0.02_0.2"], data["PSARr_0.02_0.2"],
+            data["chance"]
         ):
-            if (chance):
-                self.open_positions(data, index, date, close, long, short, drop)
+            if (chance and not position):
+                position["date_open"] = date
+                position["price_open"] = close
+                if (pd.isna(long)):
+                    position["type"] = "sell"
+                elif (pd.isna(short)):
+                    position["type"] = "buy"
+            elif position:
+                if (int(drop) == 1):
+                    position["date_close"] = date
+                    position["price_close"] = close
+                    self.result.append(position)
+                    position = {}
 
         results = pd.DataFrame(data=self.result)
+        results.to_csv("results.csv")
         print(results)
-        return data
+        return results
