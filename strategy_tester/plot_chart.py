@@ -10,6 +10,6 @@ def plot_lines_chart(data, x_label, y_label, months):
     plt.plot(x, y)
 
     ax.xaxis.set_major_locator(mdates.MonthLocator(interval=months))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%-m-%-d'))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%-m-%-d %H:%M'))
     fig.autofmt_xdate()
     plt.show()
