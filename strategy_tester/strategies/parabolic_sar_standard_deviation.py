@@ -7,15 +7,15 @@ class Strategy:
 
     def positions_table(self, data):
         data = data[[
-            "index", "date", "close", "STDEV_10", "PSARl_0.02_0.2",
+            "index", "date", "close", "STDEV_25", "PSARl_0.02_0.2",
             "PSARs_0.02_0.2", "PSARr_0.02_0.2"
         ]].copy()
         data["chance"] = False
-        data.loc[:, "chance"] = data["STDEV_10"]
+        data.loc[:, "chance"] = data["STDEV_25"]
         data.loc[data["chance"] < 2, "chance"] = 0
         data["chance"] = data["chance"].diff()
         data["chance"] = np.where(
-            data["chance"] == data["STDEV_10"],
+            data["chance"] == data["STDEV_25"],
             True, False
         )
         data = data[200:]
