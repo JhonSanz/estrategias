@@ -29,7 +29,10 @@ class StrategyTester:
         if (self.strategy_params.get("test_mode") == AFTER_ALGORITHM):
             print(self.data)
             return
-        results = StrategySelector(self.data, self.strategy_params.get('file')).run()
+        results = StrategySelector(
+            self.data, self.strategy_params.get('file'),
+            self.strategy_params.get("params")
+        ).run()
         if (self.strategy_params.get("test_mode") == AFTER_STRATEGY):
             print(results)
             return

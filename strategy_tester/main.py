@@ -2,7 +2,7 @@ import pandas as pd
 from solver import StrategyTester
 
 meta_trader_data = pd.read_csv(
-    'datos/btc_1m_.csv',
+    'datos/syp_1m_.csv',
     names=['date', 'open', 'high', 'low', 'close', 'volume', 'unknown']
 )
 meta_trader_data = meta_trader_data[['date', 'open', 'high', 'low', 'close']]
@@ -14,7 +14,7 @@ PARAMETERS = [
     {
         "function": "stdev",
         "params": {
-            "length": 25
+            "length": 15
         }
     },
     {
@@ -25,6 +25,9 @@ PARAMETERS = [
 
 STRATEGY_PARAMS = {
     "file": "parabolic_sar_standard_deviation",
+    "params": {
+        "threshold": 1.5
+    }
 }
 
 tester = StrategyTester(

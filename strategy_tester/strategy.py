@@ -1,9 +1,10 @@
 import importlib
 
 class StrategySelector:
-    def __init__(self, data, strategy):
+    def __init__(self, data, strategy, strategy_params = {}):
         self.data = data
         self.strategy = strategy
+        self.strategy_params = strategy_params
         self.module = None
 
     def validate_strategy_file(self):
@@ -14,5 +15,8 @@ class StrategySelector:
 
     def run(self):
         self.validate_strategy_file()
-        new_dataframe = getattr(self.module, 'Strategy')().positions_table(self.data)
+        new_dataframe = (
+            getattr(self.module, 'Strategy')(self.strategy_params)
+            .positions_table(self.data)
+        )
         return new_dataframe
