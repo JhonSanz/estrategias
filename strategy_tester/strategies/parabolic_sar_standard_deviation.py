@@ -7,18 +7,18 @@ class Strategy:
 
     def positions_table(self, data):
         data = data[[
-            "index", "date", "close", "STDEV_15", "PSARl_0.02_0.2",
+            "index", "date", "close", "STDEV_10", "PSARl_0.02_0.2",
             "PSARs_0.02_0.2", "PSARr_0.02_0.2"
         ]].copy()
         data["chance"] = False
-        data.loc[:, "chance"] = data["STDEV_15"]
+        data.loc[:, "chance"] = data["STDEV_10"]
         data.loc[data["chance"] < 2, "chance"] = 0
         data["chance"] = data["chance"].diff()
         data["chance"] = np.where(
-            data["chance"] == data["STDEV_15"],
+            data["chance"] == data["STDEV_10"],
             True, False
         )
-
+        data = data[200:]
         position = {}
         for date, close, long, short, drop, chance in zip(
             data["date"], data["close"], data["PSARl_0.02_0.2"],
@@ -40,6 +40,6 @@ class Strategy:
                     position = {}
 
         results = pd.DataFrame(data=self.result)
-        results.to_csv("results.csv")
-        print(results)
+        results.to_excel("files/strategy.xlsx")
+        results.to_csv("files/strategy.csv")
         return results

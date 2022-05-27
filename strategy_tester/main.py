@@ -2,7 +2,7 @@ import pandas as pd
 from solver import StrategyTester
 
 meta_trader_data = pd.read_csv(
-    'syp_1m2.csv',
+    'datos/syp_1m2 copy.csv',
     names=['date', 'open', 'high', 'low', 'close', 'volume', 'unknown']
 )
 meta_trader_data = meta_trader_data[['date', 'open', 'high', 'low', 'close']]
@@ -14,7 +14,7 @@ PARAMETERS = [
     {
         "function": "stdev",
         "params": {
-            "length": 15
+            "length": 10
         }
     },
     {

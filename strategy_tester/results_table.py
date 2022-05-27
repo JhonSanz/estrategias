@@ -4,17 +4,13 @@ class ResultsTable:
     
     def generate_totals(self):
         results = self.data
-        results['total'] = results['price_open'] - results['price_close']
-        results['type_2'] = results['type'].shift(1)
-        results.loc[results['type_2'] == 'sell', 'total'] = (
-            results[results['type_2'] == 'sell']['total'] * -1
-        )
-        results.loc[results['type_2'] == 'buy', 'total'] = (
-            results[results['type_2'] == 'buy']['total']
-        )
+        results['total'] = results['price_close'] - results['price_open']
+        results.loc[results['type'] == 'sell', 'total'] = results['total'] * (-1)
         results['total_sum'] = results.total.cumsum()
         results = results[[
             'date_open', 'price_open', 'date_close',
             'price_close', 'type', 'total', 'total_sum'
         ]]
+        results.to_excel("files/totals.xlsx")
+        results.to_csv("files/totals.csv")
         return results
