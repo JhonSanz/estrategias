@@ -12,22 +12,28 @@ meta_trader_data['date'] = pd.to_datetime(meta_trader_data['date'], format='%Y.%
 
 PARAMETERS = [
     {
-        "function": "stdev",
+        "function": "sma",
         "params": {
-            "length": 15
+            "length": 11
         }
     },
     {
-        "function": "psar",
-        "params": {}
+        "function": "sma",
+        "params": {
+            "length": 265
+        }
+    },
+    {
+        "function": "rsi",
+        "params": {
+            "length": 2
+        }
     },
 ]
 
 STRATEGY_PARAMS = {
-    "file": "parabolic_sar_standard_deviation",
-    "params": {
-        "threshold": 1.5
-    }
+    "file": "ma11_265_rsi",
+    "params": {}
 }
 
 tester = StrategyTester(

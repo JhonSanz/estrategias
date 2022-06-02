@@ -1,6 +1,10 @@
 import pandas as pd
 
 class Strategy:
+    def __init__(self, params = {}):
+        self.params = params
+        self.result = []
+
     def position_type(self, close, ma_100):
         return 'sell' if close < ma_100 else 'buy'
 

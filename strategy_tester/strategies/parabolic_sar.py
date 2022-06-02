@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 
 class Strategy:
-    def __init__(self):
+    def __init__(self, params = {}):
+        self.params = params
         self.result = []
 
     def positions_table(self, data):

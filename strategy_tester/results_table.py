@@ -9,7 +9,7 @@ class ResultsTable:
         results['total_sum'] = results.total.cumsum()
         results = results[[
             'date_open', 'price_open', 'date_close',
-            'price_close', 'type', 'total', 'total_sum'
+            'price_close', 'type', 'total', 'total_sum', 'stop'
         ]]
         results.to_excel("files/totals.xlsx")
         results.to_csv("files/totals.csv")
