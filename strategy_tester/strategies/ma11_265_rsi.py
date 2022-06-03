@@ -6,8 +6,9 @@ class Strategy:
     def __init__(self, params = {}):
         self.params = params
         self.result = []
-        self.rsi_high = 74
-        self.rsi_low = 9
+        self.rsi_high = 75
+        self.rsi_low = 25
+        self.presition = 2
 
     def positions_table(self, data):
         data = data[[
@@ -44,8 +45,6 @@ class Strategy:
             True, False
         )
 
-        # print(data[250:270])
-
         position = {}
         stop = 0
         for (
@@ -78,11 +77,11 @@ class Strategy:
                     if chance_high:
                         # venta
                         position["type"] = "sell"
-                        stop = close + close * 0.001
+                        stop = close + close * (0.1 * 10**(self.presition * -1))
                     elif chance_low:
                         # compra
                         position["type"] = "buy"
-                        stop = close - close * 0.001
+                        stop = close - close * (0.1 * 10**(self.presition * -1))
             elif position:
                 if (
                     (

@@ -5,11 +5,12 @@ from results_table import ResultsTable
 from constant import *
 
 class StrategyTester:
-    def __init__(self, data, strategy_params, parameters, months):
+    def __init__(self, data, strategy_params, parameters, months, title):
         self.data = data
         self.strategy_params = strategy_params
         self.parameters = parameters
         self.months = months
+        self.title = title
 
     def _choose_algorithms(self):
         for parameter in self.parameters:
@@ -40,4 +41,7 @@ class StrategyTester:
         if (self.strategy_params.get("test_mode") == RESULTS_TABLE):
             print(results)
             return
-        plot_lines_chart(results, 'date_close', 'total_sum', self.months)
+        plot_lines_chart(
+            results, 'date_close', 'total_sum',
+            self.months, self.title.split('/')[-1]
+        )
