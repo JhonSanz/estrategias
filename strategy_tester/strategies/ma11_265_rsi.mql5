@@ -1,0 +1,106 @@
+#include <Trade/Trade.mqh>
+#include <Trade/PositionInfo.mqh>
+
+CTrade trade;
+CPositionInfo pos_info;
+
+int ma_265_handler = 0;
+int ma_11_handler = 0;
+int rsi_2_handler = 0;
+
+ulong trade_ticket = 0;
+bool time_passed = true;
+
+double ma_265_array[];
+double ma_11_array[];
+double rsi_2_array[];
+double ma_11_close_pos[];
+
+double stop = 0;
+
+double candle_close;
+datetime time_candle;
+
+bool done = false;
+
+int OnInit() {
+   ma_265_handler = iMA(_Symbol, _Period, 265, 0, MODE_SMA, PRICE_CLOSE);
+   ma_11_handler = iMA(_Symbol, _Period, 11, 0, MODE_SMA, PRICE_CLOSE);
+   rsi_2_handler = iRSI(_Symbol, _Period, 2, PRICE_CLOSE);
+
+   return(INIT_SUCCEEDED);
+}
+
+void OnTick() {
+   CopyBuffer(ma_265_handler, 0, 1, 1, ma_265_array);
+   CopyBuffer(ma_11_handler, 0, 1, 1, ma_11_array);
+   CopyBuffer(rsi_2_handler, 0, 0, 2, rsi_2_array);
+   
+   candle_close = iClose(_Symbol, _Period, 1);
+   time_candle = iTime(_Symbol, _Period, 1);
+   
+   if (!PositionSelectByTicket(trade_ticket)) trade_ticket = 0;
+   if (trade_ticket > 0) {
+      CopyBuffer(ma_11_handler, 0, 0, 2, ma_11_close_pos);
+      /* CERRAR POSICIONES */
+      /* ------------------------------------------------------------------------ */
+      if (
+         (
+            pos_info.PositionType() == POSITION_TYPE_SELL
+            && candle_close > ma_11_close_pos[0]
+         ) ||
+         (
+            pos_info.PositionType() == POSITION_TYPE_BUY
+            && true
+         )
+      ) {
+         Comment(
+            "Position type ", pos_info.PositionType(),
+            "\n",
+            "Price open ", pos_info.PriceOpen()
+         );
+         trade.PositionClose(trade_ticket);
+      }
+      /* ------------------------------------------------------------------------ */
+   } else {
+      /* ABRIR POSICIONES */
+      /* ------------------------------------------------------------------------ */
+      if (
+         // compra
+         (
+            candle_close > ma_265_array[0]
+            && candle_close < ma_11_array[0]
+            && (
+               rsi_2_array[0] < 25
+               && rsi_2_array[1] > rsi_2_array[0]
+               && rsi_2_array[1] > 25
+            )
+         )
+      ) {
+         double Ask = NormalizeDouble(SymbolInfoDouble(_Symbol, SYMBOL_ASK), _Digits);   
+         trade.Buy(1, _Symbol, Ask, 0); // TODO: SET STOP
+         trade_ticket = trade.ResultOrder();
+      } else if (
+         // venta
+         (
+            candle_close < ma_265_array[0]
+            && candle_close > ma_11_array[0]
+            && (
+               rsi_2_array[0] > 75
+               && rsi_2_array[1] < rsi_2_array[0]
+               && rsi_2_array[1] < 75
+            )
+         )
+      ) {
+         double Bid = NormalizeDouble(SymbolInfoDouble(_Symbol, SYMBOL_BID), _Digits);
+         trade.Sell(0.01, _Symbol, Bid, 0); // TODO: SET STOP
+         trade_ticket = trade.ResultOrder();
+      }
+      /* ------------------------------------------------------------------------ */
+   } 
+}
+/*
+void OnTimer() {
+   time_passed = true;
+}
+*/
