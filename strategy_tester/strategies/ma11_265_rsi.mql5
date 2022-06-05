@@ -19,7 +19,12 @@ double ma_11_close_pos[];
 double stop = 0;
 
 double candle_close;
+double prev_close;
 datetime time_candle;
+
+
+double current_open;
+double prev_open;
 
 bool done = false;
 
@@ -32,26 +37,30 @@ int OnInit() {
 }
 
 void OnTick() {
-   CopyBuffer(ma_265_handler, 0, 1, 1, ma_265_array);
-   CopyBuffer(ma_11_handler, 0, 1, 1, ma_11_array);
+   CopyBuffer(ma_265_handler, 0, 0, 1, ma_265_array);
+   CopyBuffer(ma_11_handler, 0, 0, 1, ma_11_array);
    CopyBuffer(rsi_2_handler, 0, 0, 2, rsi_2_array);
    
-   candle_close = iClose(_Symbol, _Period, 1);
-   time_candle = iTime(_Symbol, _Period, 1);
+   candle_close = iClose(_Symbol, _Period, 0);
+   time_candle = iTime(_Symbol, _Period, 0);
    
+   if (time_passed == false) return;
    if (!PositionSelectByTicket(trade_ticket)) trade_ticket = 0;
    if (trade_ticket > 0) {
       CopyBuffer(ma_11_handler, 0, 0, 2, ma_11_close_pos);
-      /* CERRAR POSICIONES */
-      /* ------------------------------------------------------------------------ */
+      current_open = iOpen(_Symbol, _Period, 0);
+      prev_open = iOpen(_Symbol, _Period, 1);
+      /* CLOSING POSITIONS */
       if (
          (
             pos_info.PositionType() == POSITION_TYPE_SELL
-            && candle_close > ma_11_close_pos[0]
+            && prev_open > ma_11_close_pos[1]
+            && current_open < ma_11_close_pos[0]
          ) ||
          (
             pos_info.PositionType() == POSITION_TYPE_BUY
-            && true
+            && prev_open < ma_11_close_pos[1]
+            && current_open > ma_11_close_pos[0]
          )
       ) {
          Comment(
@@ -59,14 +68,12 @@ void OnTick() {
             "\n",
             "Price open ", pos_info.PriceOpen()
          );
-         trade.PositionClose(trade_ticket);
+         trade.PositionClose(trade_ticket);  
       }
-      /* ------------------------------------------------------------------------ */
    } else {
-      /* ABRIR POSICIONES */
-      /* ------------------------------------------------------------------------ */
+      /* OPENING POSITIONS */
       if (
-         // compra
+         // buy
          (
             candle_close > ma_265_array[0]
             && candle_close < ma_11_array[0]
@@ -80,8 +87,10 @@ void OnTick() {
          double Ask = NormalizeDouble(SymbolInfoDouble(_Symbol, SYMBOL_ASK), _Digits);   
          trade.Buy(1, _Symbol, Ask, 0); // TODO: SET STOP
          trade_ticket = trade.ResultOrder();
+         time_passed = false;
+         EventSetTimer(60);
       } else if (
-         // venta
+         // sell
          (
             candle_close < ma_265_array[0]
             && candle_close > ma_11_array[0]
@@ -95,12 +104,13 @@ void OnTick() {
          double Bid = NormalizeDouble(SymbolInfoDouble(_Symbol, SYMBOL_BID), _Digits);
          trade.Sell(0.01, _Symbol, Bid, 0); // TODO: SET STOP
          trade_ticket = trade.ResultOrder();
+         time_passed = false;
+         EventSetTimer(60);
       }
-      /* ------------------------------------------------------------------------ */
    } 
 }
-/*
+
 void OnTimer() {
    time_passed = true;
 }
-*/
+
