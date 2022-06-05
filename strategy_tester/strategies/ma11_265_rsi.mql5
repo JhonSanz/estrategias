@@ -37,19 +37,19 @@ int OnInit() {
 }
 
 void OnTick() {
-   CopyBuffer(ma_265_handler, 0, 0, 1, ma_265_array);
-   CopyBuffer(ma_11_handler, 0, 0, 1, ma_11_array);
-   CopyBuffer(rsi_2_handler, 0, 0, 2, rsi_2_array);
+   CopyBuffer(ma_265_handler, 0, 1, 1, ma_265_array);
+   CopyBuffer(ma_11_handler, 0, 1, 1, ma_11_array);
+   CopyBuffer(rsi_2_handler, 0, 1, 2, rsi_2_array);
    
-   candle_close = iClose(_Symbol, _Period, 0);
-   time_candle = iTime(_Symbol, _Period, 0);
+   candle_close = iClose(_Symbol, _Period, 1);
+   time_candle = iTime(_Symbol, _Period, 1);
    
    if (time_passed == false) return;
    if (!PositionSelectByTicket(trade_ticket)) trade_ticket = 0;
    if (trade_ticket > 0) {
-      CopyBuffer(ma_11_handler, 0, 0, 2, ma_11_close_pos);
-      current_open = iOpen(_Symbol, _Period, 0);
-      prev_open = iOpen(_Symbol, _Period, 1);
+      CopyBuffer(ma_11_handler, 0, 1, 2, ma_11_close_pos);
+      current_open = iClose(_Symbol, _Period, 1);
+      prev_open = iClose(_Symbol, _Period, 2);
       /* CLOSING POSITIONS */
       if (
          (
