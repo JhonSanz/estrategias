@@ -7,6 +7,7 @@ CPositionInfo pos_info;
 int ma_265_handler = 0;
 int ma_11_handler = 0;
 int rsi_2_handler = 0;
+int atr_14_handler = 0;
 
 ulong trade_ticket = 0;
 bool time_passed = true;
@@ -15,6 +16,7 @@ double ma_265_array[];
 double ma_11_array[];
 double rsi_2_array[];
 double ma_11_close_pos[];
+double atr_14_array[];
 
 double stop = 0;
 
@@ -32,6 +34,7 @@ int OnInit() {
    ma_265_handler = iMA(_Symbol, _Period, 265, 0, MODE_SMA, PRICE_CLOSE);
    ma_11_handler = iMA(_Symbol, _Period, 11, 0, MODE_SMA, PRICE_CLOSE);
    rsi_2_handler = iRSI(_Symbol, _Period, 2, PRICE_CLOSE);
+   atr_14_handler = iATR(_Symbol, _Period, 14);
 
    return(INIT_SUCCEEDED);
 }
@@ -43,13 +46,13 @@ void OnTick() {
    
    candle_close = iClose(_Symbol, _Period, 1);
    time_candle = iTime(_Symbol, _Period, 1);
-   
+  
    if (time_passed == false) return;
    if (!PositionSelectByTicket(trade_ticket)) trade_ticket = 0;
    if (trade_ticket > 0) {
       CopyBuffer(ma_11_handler, 0, 1, 2, ma_11_close_pos);
+      prev_open = iOpen(_Symbol, _Period, 2);
       current_open = iClose(_Symbol, _Period, 1);
-      prev_open = iClose(_Symbol, _Period, 2);
       /* CLOSING POSITIONS */
       if (
          (
@@ -71,6 +74,14 @@ void OnTick() {
          trade.PositionClose(trade_ticket);  
       }
    } else {
+      
+      double Ask_op = NormalizeDouble(SymbolInfoDouble(_Symbol, SYMBOL_ASK), _Digits);
+      double Bid_op = NormalizeDouble(SymbolInfoDouble(_Symbol, SYMBOL_BID), _Digits);
+      double diferential = Ask_op - Bid_op;
+      if(diferential > 1) return;
+
+      CopyBuffer(atr_14_handler, 0, 1, 1, atr_14_array);
+
       /* OPENING POSITIONS */
       if (
          // buy
@@ -85,10 +96,10 @@ void OnTick() {
          )
       ) {
          double Ask = NormalizeDouble(SymbolInfoDouble(_Symbol, SYMBOL_ASK), _Digits);   
-         trade.Buy(1, _Symbol, Ask, 0); // TODO: SET STOP
+         trade.Buy(1, _Symbol, Ask, Ask - (atr_14_array[0]), 0, (string)atr_14_array[0]); // TODO: SET STOP
          trade_ticket = trade.ResultOrder();
          time_passed = false;
-         EventSetTimer(60);
+         EventSetTimer(300);
       } else if (
          // sell
          (
@@ -102,10 +113,10 @@ void OnTick() {
          )
       ) {
          double Bid = NormalizeDouble(SymbolInfoDouble(_Symbol, SYMBOL_BID), _Digits);
-         trade.Sell(0.01, _Symbol, Bid, 0); // TODO: SET STOP
+         trade.Sell(1, _Symbol, Bid, Bid + (atr_14_array[0]), 0, (string)atr_14_array[0]);
          trade_ticket = trade.ResultOrder();
          time_passed = false;
-         EventSetTimer(60);
+         EventSetTimer(300);
       }
    } 
 }
